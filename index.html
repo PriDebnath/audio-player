@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta linkined="https://www.linkedin.com/in/pritam-debnath-762019239?utm_source=share&utm_campaign=share_via&utm_content=profile&utm_medium=android_app">
+  <meta author="Pritam Debnath">
+  <title>Audio Player</title>
+  <style>
+    .d-flex {
+      display: flex;
+    }
+
+    .d-none {
+      display: none !important;
+    }
+
+    .align-items-center {
+      align-items: center;
+    }
+
+    .justify-content-between {
+      justify-content: space-between;
+    }
+
+    .pb-3 {
+      padding-bottom: 1rem;
+    }
+
+    .px-2 {
+      padding-left: 0.5rem;
+      padding-right: 0.5rem;
+    }
+
+    .font-weight-600 {
+      font-weight: 600;
+    }
+
+    .font-size-16px {
+      font-size: 16px;
+    }
+
+    .btn {
+      padding: 0.375rem 0.75rem;
+      border: 1px solid transparent;
+      border-radius: 0.25rem;
+    }
+
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+      color: white;
+    }
+
+    .mx-3 {
+      margin-left: 1rem;
+      margin-right: 1rem;
+    }
+
+    .text-center {
+      text-align: center;
+    }
+
+    .close {
+      font-size: 1.5rem;
+      border: none;
+      background: none;
+      cursor: pointer;
+    }
+
+    .border-1px-defaultBorderColor {
+      border: 1px solid #ddd;
+      overflow: hidden;
+      padding: 0.4rem 0.8rem;
+      max-width: 20rem;
+      margin: auto;
+    }
+
+    .borderRadius {
+      border-radius: 0.25rem;
+    }
+
+    .beat-container {
+      display: flex;
+      align-items: center;
+      position: relative;
+      height: 5rem;
+      overflow: hidden;
+      padding: 1rem 0;
+      width: 100%;
+      margin: 1rem auto 0 auto;
+    }
+
+    .display-beats {
+      position: absolute;
+      width: 100%;
+      top: 0;
+      bottom: 0;
+      backdrop-filter: grayscale();
+      cursor: pointer;
+    }
+
+    .beat {
+      background-color: #C41D7F;
+      width: 0.2rem;
+      padding: 0.2rem;
+      margin-right: 0.1rem;
+      border-radius: 0.4rem;
+    }
+
+    .cursor-pointer {
+      cursor: pointer;
+    }
+
+    .collapse-toggle {
+      cursor: pointer;
+    }
+
+    .collapse-toggle-box {
+      position: relative;
+    }
+
+    .collapse-toggle {
+      padding: 0.5rem;
+    }
+
+    .collapse-toggle-box ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .collapse-toggle-box ul li {
+      margin: 0.5rem 0;
+    }
+
+    .audio-player {
+      width: 100%;
+    }
+
+
+    /* input range */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 2px;
+      background: #ddd;
+      border-radius: 5px;
+      outline: none;
+    }
+
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      background: #C41D7F;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      background: #C41D7F;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+
+    input[type="range"]::-ms-thumb {
+      width: 10px;
+      height: 10px;
+      background: red;
+      cursor: pointer;
+      border-radius: 50%;
+    }
+
+
+    input[type="range"]::-moz-range-track {
+      width: 100%;
+      height: 8px;
+      cursor: pointer;
+      background: #C41D7F;
+      border-radius: 5px;
+    }
+
+    input[type="range"]::-ms-track {
+      width: 100%;
+      height: 8px;
+      cursor: pointer;
+      background: transparent;
+      border-color: transparent;
+      color: transparent;
+    }
+
+    input[type="range"]::-ms-fill-lower {
+      background: #C41D7F;
+      border-radius: 5px;
+    }
+
+    input[type="range"]::-ms-fill-upper {
+      background: #C41D7F;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="border-1px-defaultBorderColor borderRadius">
+
+    <div class="d-flex flex-column px-3 py-2 w-100 ">
+      <!-- audio-player  -->
+      <div class="d-flex align-items-center justify-content-between audio-player">
+        <!--play/pause-->
+        <div class="play-pause d-flex align-items-center justify-content-center">
+          <span id="playButton" class="d-flex align-items-center justify-content-center cursor-pointer" style="padding: 1rem; border-radius: 4rem; background-color: #C41D7F;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M9 1.125C4.65117 1.125 1.125 4.65117 1.125 9C1.125 13.3488 4.65117 16.875 9 16.875C13.3488 16.875 16.875 13.3488 16.875 9C16.875 4.65117 13.3488 1.125 9 1.125ZM11.533 9.12129L7.69395 11.9145C7.6729 11.9296 7.64809 11.9386 7.62225 11.9405C7.5964 11.9425 7.57052 11.9373 7.54745 11.9255C7.52438 11.9137 7.50501 11.8957 7.49147 11.8736C7.47793 11.8515 7.47074 11.8261 7.4707 11.8002V6.21738C7.47062 6.19141 7.47773 6.16593 7.49124 6.14375C7.50475 6.12157 7.52414 6.10357 7.54726 6.09174C7.57038 6.07991 7.59632 6.07471 7.62221 6.07672C7.6481 6.07873 7.67293 6.08787 7.69395 6.10313L11.533 8.89453C11.5511 8.90736 11.5659 8.92435 11.5762 8.94408C11.5864 8.96381 11.5917 8.9857 11.5917 9.00791C11.5917 9.03012 11.5864 9.05201 11.5762 9.07174C11.5659 9.09147 11.5511 9.10846 11.533 9.12129V9.12129Z" fill="white" />
+            </svg>
+          </span>
+          <span id="pauseButton" class="d-none d-flex align-items-center justify-content-center cursor-pointer" style="padding: 1rem; border-radius: 4rem; background-color: #C41D7F;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M9 1.125C4.65117 1.125 1.125 4.65117 1.125 9C1.125 13.3488 4.65117 16.875 9 16.875C13.3488 16.875 16.875 13.3488 16.875 9C16.875 4.65117 13.3488 1.125 9 1.125ZM8.25 12.375H6.75V5.625H8.25V12.375ZM11.25 12.375H9.75V5.625H11.25V12.375Z" fill="white" />
+            </svg>
+          </span>
+        </div>
+        <div>
+          <div class="d-flex align-items-center justify-content-between pb-1">
+            <span class="text-sm colorText font-family-sf-pro-text" id="currentTime">00:00</span>
+            <span>/</span>
+            <span class="text-sm colorText font-family-sf-pro-text" id="duration"> / 00:00</span>
+
+          </div>
+
+          <div>
+            <input type="range" id="volumeControl" min="0" max="1" step="0.01" value="1" />
+
+          </div>
+        </div>
+
+        <div>
+          <div class="">
+            <select name="" id="select-playback-rate">
+              <option value="0.5">0.5x</option>
+              <option value="1" selected>1x</option>
+              <option value="1.25">1.25x</option>
+              <option value="1.5">1.5x</option>
+              <option value="1.75">1.75x</option>
+              <option value="2">2x</option>
+            </select>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+    <div class="text-center" id="audioName">No audio found</div>
+
+    <!-- beats container -->
+    <div id="beatContainer" class="beat-container">
+
+      <div id="display-beats" class="display-beats">
+      </div>
+      <audio id="audioPlayer" ontimeupdate="updateProgress()" onended="onAudioEnd()">
+      </audio>
+    </div>
+
+    <script>
+      // Get ref of elements
+      const audioPlayer = document.getElementById('audioPlayer');
+      const playButton = document.getElementById('playButton');
+      const pauseButton = document.getElementById('pauseButton');
+      const currentTimeElement = document.getElementById('currentTime');
+      const durationElement = document.getElementById('duration');
+      const beatContainer = document.getElementById('beatContainer');
+      const playbackSpeedList = document.getElementById('playbackSpeedList');
+      const displayBeats = document.getElementById('display-beats');
+      const audioName = document.getElementById('audioName');
+      const volumeControl = document.getElementById('volumeControl');
+      const selectPlaybackRate = document.getElementById('select-playback-rate');
+
+
+      //
+      let isPlaying = false;
+      let playbackSpeed = 1;
+
+
+      let audioSrc = "/audio/Demon Slayer Ringtone.mp3
+
+      audioPlayer.src = audioSrc
+      audioName.textContent = getAudioName(audioSrc)
+
+      audioName.addEventListener('click', () => {
+        let newSrc = prompt('Put your own audio link')
+        if (newSrc) {
+          audioPlayer.src = newSrc
+          audioName.textContent = getAudioName(newSrc)
+        } else {
+          audioPlayer.src = audioSrc
+        }
+      })
+
+
+      document.addEventListener('DOMContentLoaded', () => {
+        generateRandomBeats(100);
+        pauseButton.classList.add('d-none');
+      });
+
+      playButton.addEventListener('click', playAudio);
+      pauseButton.addEventListener('click', pauseAudio);
+      beatContainer.addEventListener('click', seekAudio);
+      audioPlayer.addEventListener('loadedmetadata', () => {
+        durationElement.innerText = formatTime(audioPlayer.duration);
+      });
+
+
+      function getAudioName(src) {
+        let arr = src.split("/")
+        let name = arr[arr.length - 1]
+        return name
+      }
+
+      function playAudio() {
+        audioPlayer.play();
+        isPlaying = true;
+        playButton.classList.add('d-none');
+        pauseButton.classList.remove('d-none');
+      }
+
+      function pauseAudio() {
+        audioPlayer.pause();
+        isPlaying = false;
+        playButton.classList.remove('d-none');
+        pauseButton.classList.add('d-none');
+      }
+
+      function seekAudio(event) {
+        const rect = beatContainer.getBoundingClientRect();
+        const offsetX = event.clientX - rect.left;
+        const width = rect.width;
+        const percentage = (offsetX / width) * 100;
+        const newTime = (percentage / 100) * audioPlayer.duration;
+        audioPlayer.currentTime = newTime;
+      }
+
+      function changeSpeed(speed) {
+        audioPlayer.playbackRate = speed;
+        playbackSpeed = speed;
+      }
+
+      function updateProgress() {
+        const currentTime = audioPlayer.currentTime;
+        const duration = audioPlayer.duration;
+        currentTimeElement.innerText = formatTime(currentTime);
+        const progress = Math.round((currentTime / duration) * 100);
+        displayBeats.style.transform = `translateX(${progress}%)`
+      }
+
+      function onAudioEnd() {
+        isPlaying = false;
+        playButton.classList.remove('d-none');
+        pauseButton.classList.add('d-none');
+      }
+
+      function togglePlaybackSpeed() {
+        playbackSpeedList.classList.toggle('d-none');
+      }
+
+      function formatTime(seconds) {
+        const minutes = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      }
+
+      function generateRandomBeats(length) {
+        for (let i = 0; i < length; i++) {
+          const beat = document.createElement('div');
+          beat.classList.add('beat');
+          beat.style.height = Math.random() * 100 + 'px';
+          beatContainer.appendChild(beat);
+        }
+      }
+
+
+      volumeControl.addEventListener('input', changeVolume);
+      selectPlaybackRate.addEventListener('change', changeSpeed);
+
+      function changeVolume(event) {
+        audioPlayer.volume = event.target.value;
+      }
+
+      function changeSpeed(event) {
+        audioPlayer.playbackRate = event.target.value;
+      }
+    </script>
+</body>
+
+</html>
